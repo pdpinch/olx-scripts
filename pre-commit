@@ -14,6 +14,7 @@ run=$(echo $commit_msg| cut -d'"' -f 2)
 # abort if we can't find the run
 if [ -z $run ]
 then
+    echo "could not find run. proceed with commit"
     exit 0
 else
     echo "Course run is $run"
