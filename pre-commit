@@ -1,0 +1,40 @@
+#!/bin/sh
+#
+# To enable this hook, rename this file to "pre-commit".
+
+# find the course term
+commit_msg=$(git log -1 --grep='initial commit of course.xml with term' --oneline)
+term=$(echo $commit_msg| cut -d'"' -f 2)
+echo "Course term is $term"
+
+# update the /course.xml
+if [ -e course.xml ]
+then 
+    echo "replacing url_name in course.xml"
+    sed -i '' s/url_name=\"course\"/url_name=\"$term\"/ course.xml
+    git add course.xml
+fi
+
+# mv /course/course.xml
+if [ -e course/course.xml ]
+then 
+    echo "git mv course/course.xml course/$term.xml"
+    git mv course/course.xml course/$term.xml
+fi
+
+# edit polices/course/policy.json
+if [ -e policies/course/policy.json ]
+then
+    echo "changing course key in policy.json"
+    sed -i '' s+\"course/course\":+\"course/$term\":+ policies/course/policy.json
+    git add policies/course/policy.json
+fi
+
+# move /policies/course/
+if [ -e policies/course/ ]
+then 
+    echo "git mv policies/course/ policies/$term/"
+    git mv policies/course/ policies/$term/
+fi
+
+exit 0
